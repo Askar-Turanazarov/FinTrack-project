@@ -41,6 +41,10 @@ Built with a modern dark UI inspired by Stripe and Revolut.
 - Node.js v18+
 - npm
 
+- ### 🌐 Live Demo
+Frontend: [FinTrack on GitHub Pages](https://askar-turanazarov.github.io/FinTrack-project/)
+Backend API: [FinTrack API on Vercel](https://fintrack-three-xi.vercel.app/api)
+
 #### 1. Clone the repository
 
 ```bash
