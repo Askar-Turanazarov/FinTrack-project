@@ -11,7 +11,7 @@ import IncomeSourcesPage from './pages/IncomeSourcesPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/FinTrack-project">   {/* добавлен basename */}
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
