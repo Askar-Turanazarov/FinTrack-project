@@ -6,7 +6,7 @@ interface ExpenseFormData {
   amountMinor: number;
   currency: string;
   spentAt: string;
-  description: string;
+  description: string | null;
   isRecurring: boolean;
   recurrence: string | null;
 }
@@ -52,7 +52,7 @@ export default function ExpenseForm({ initialData, categories, onSubmit, onCance
       amountMinor,
       currency: 'UZS',
       spentAt,
-      description,
+      description: description || null,
       isRecurring,
       recurrence: isRecurring ? recurrence : null,
     });

@@ -5,7 +5,7 @@ interface IncomeFormData {
   amountMinor: number;
   currency: string;
   receivedAt: string;
-  note: string;
+  note: string | null;
   isRecurring: boolean;
   recurrence: string | null;
 }
@@ -55,7 +55,7 @@ export default function IncomeForm({ initialData, sources, onSubmit, onCancel }:
       amountMinor,
       currency: 'UZS',
       receivedAt,
-      note,
+      note: note || null,
       isRecurring,
       recurrence: isRecurring ? recurrence : null,
     });

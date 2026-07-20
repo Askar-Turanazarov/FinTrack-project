@@ -5,7 +5,7 @@ import {
   updateIncomeSource,
   deleteIncomeSource,
 } from '../api/endpoints';
-import type { IncomeSource } from '../types';
+import type { IncomeSource, IncomeSourceType } from '../types';
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 
 export default function IncomeSourcesPage() {
@@ -15,7 +15,7 @@ export default function IncomeSourcesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [name, setName] = useState('');
-  const [type, setType] = useState('salary');
+  const [type, setType] = useState<IncomeSourceType>('salary');
 
   const loadSources = async () => {
     setLoading(true);
@@ -119,7 +119,7 @@ export default function IncomeSourcesPage() {
               <label className="block text-sm text-slate-400 mb-1">Тип</label>
               <select
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => setType(e.target.value as IncomeSourceType)}
                 className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
               >
                 <option value="salary">Зарплата</option>
