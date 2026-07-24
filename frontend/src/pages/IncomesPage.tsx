@@ -8,11 +8,8 @@ import {
 } from '../api/endpoints';
 import type { Income, IncomeSource, PaginatedResponse } from '../types';
 import IncomeForm from '../components/IncomeForm';
-import { Plus, Pencil, Trash2, ArrowUpDown } from 'lucide-react';
-
-function formatMoney(minor: number): string {
-  return (minor / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2 });
-}
+import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { formatMoney } from '../utils/format';
 
 export default function IncomesPage() {
   const [data, setData] = useState<PaginatedResponse<Income> | null>(null);
@@ -90,35 +87,35 @@ export default function IncomesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-up">
         <h2 className="text-2xl font-semibold tracking-tight">Доходы</h2>
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors shadow-lg shadow-indigo-600/20"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/20 btn-lift"
         >
           <Plus className="h-4 w-4" strokeWidth={2} />
           Добавить доход
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-end">
+      {/* Фильтры */}
+      <div className="flex flex-wrap gap-3 items-end animate-fade-in-up delay-100 animate-delay-base">
         <div>
           <label className="block text-xs text-slate-400 mb-1">С</label>
           <input type="date" value={from} onChange={e => { setFrom(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 input-glow"
           />
         </div>
         <div>
           <label className="block text-xs text-slate-400 mb-1">По</label>
           <input type="date" value={to} onChange={e => { setTo(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 input-glow"
           />
         </div>
         <div>
           <label className="block text-xs text-slate-400 mb-1">Источник</label>
           <select value={filterSourceId ?? ''} onChange={e => { setFilterSourceId(e.target.value ? Number(e.target.value) : null); setPage(1); }}
-            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 input-glow"
           >
             <option value="">Все</option>
             {sources.filter(s => s.isActive).map(s => (
@@ -128,11 +125,11 @@ export default function IncomesPage() {
         </div>
       </div>
 
-      {error && <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl">{error}</div>}
+      {error && <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl animate-fade-in-up">{error}</div>}
 
-      {/* Form */}
+      {/* Форма */}
       {showForm && (
-        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6">
+        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 animate-fade-in-scale">
           <h3 className="text-lg font-semibold mb-4">{editingIncome ? 'Редактировать доход' : 'Новый доход'}</h3>
           <IncomeForm
             sources={sources}
@@ -143,13 +140,13 @@ export default function IncomesPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Таблица */}
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-400"></div>
         </div>
       ) : data && data.items.length > 0 ? (
-        <div className="overflow-x-auto rounded-2xl border border-slate-800/80">
+        <div className="overflow-x-auto rounded-2xl border border-slate-800/60 animate-fade-in-up delay-200 animate-delay-base">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-900 text-slate-400 font-medium">
               <tr>
@@ -161,11 +158,11 @@ export default function IncomesPage() {
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-800/60">
               {data.items.map(income => {
                 const source = sources.find(s => s.id === income.sourceId);
                 return (
-                  <tr key={income.id} className="hover:bg-slate-800/30 transition-colors">
+                  <tr key={income.id} className="hover:bg-slate-800/30 transition-colors duration-200">
                     <td className="px-4 py-3 text-slate-300">{income.receivedAt}</td>
                     <td className="px-4 py-3 text-slate-300">{source?.name || '—'}</td>
                     <td className="px-4 py-3 font-mono tabular-nums text-emerald-400">{formatMoney(income.amountMinor)} сум</td>
@@ -173,10 +170,10 @@ export default function IncomesPage() {
                     <td className="px-4 py-3 text-slate-400">{income.isRecurring ? income.recurrence === 'monthly' ? 'Ежемес.' : 'Ежегод.' : 'Нет'}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <button onClick={() => openEdit(income)} className="p-1 text-slate-400 hover:text-indigo-400 transition-colors">
+                        <button onClick={() => openEdit(income)} className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all duration-200">
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button onClick={() => handleDelete(income.id)} className="p-1 text-slate-400 hover:text-rose-400 transition-colors">
+                        <button onClick={() => handleDelete(income.id)} className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all duration-200">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
@@ -188,16 +185,16 @@ export default function IncomesPage() {
           </table>
         </div>
       ) : (
-        <div className="text-center py-12 text-slate-500">Доходов пока нет</div>
+        <div className="text-center py-12 text-slate-500 animate-fade-in-up">Доходов пока нет</div>
       )}
 
-      {/* Pagination */}
+      {/* Пагинация */}
       {data && data.total > 0 && (
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-sm animate-fade-in-up">
           <button
             disabled={page <= 1}
             onClick={() => setPage(p => p - 1)}
-            className="px-3 py-1 bg-slate-800 rounded-lg disabled:opacity-30 hover:bg-slate-700 transition-colors"
+            className="px-3 py-1 bg-slate-800 rounded-lg disabled:opacity-30 hover:bg-slate-700 transition-all duration-200 btn-lift"
           >
             Назад
           </button>
@@ -205,7 +202,7 @@ export default function IncomesPage() {
           <button
             disabled={data.items.length < data.limit}
             onClick={() => setPage(p => p + 1)}
-            className="px-3 py-1 bg-slate-800 rounded-lg disabled:opacity-30 hover:bg-slate-700 transition-colors"
+            className="px-3 py-1 bg-slate-800 rounded-lg disabled:opacity-30 hover:bg-slate-700 transition-all duration-200 btn-lift"
           >
             Вперёд
           </button>

@@ -16,12 +16,9 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer,
 } from 'recharts';
 import { Calendar, ArrowUpRight, ArrowDownRight, Wallet, Repeat } from 'lucide-react';
+import { formatMoney } from '../utils/format';
 
 const COLORS = ['#818cf8', '#34d399', '#f472b6', '#a78bfa', '#f87171'];
-
-function formatMoney(minor: number): string {
-  return (minor / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2 });
-}
 
 export default function DashboardPage() {
   const now = new Date();
@@ -69,7 +66,7 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl">
+      <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl animate-fade-in-up">
         {error}
       </div>
     );
@@ -77,8 +74,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header with Month Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Заголовок с выбором месяца */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-up">
         <h1 className="text-2xl font-semibold tracking-tight">Обзор финансов</h1>
         <div className="relative">
           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" strokeWidth={1.5} />
@@ -86,15 +83,15 @@ export default function DashboardPage() {
             type="month"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            className="pl-10 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all"
+            className="pl-10 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all input-glow"
           />
         </div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Карточки сводки */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/80 hover:translate-y-[-1px] transition-all duration-200">
+          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 card-hover animate-fade-in-up delay-100 animate-delay-base">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-emerald-500/10 rounded-xl">
                 <ArrowUpRight className="h-5 w-5 text-emerald-400" strokeWidth={1.75} />
@@ -106,7 +103,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/80 hover:translate-y-[-1px] transition-all duration-200">
+          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 card-hover animate-fade-in-up delay-200 animate-delay-base">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-rose-500/10 rounded-xl">
                 <ArrowDownRight className="h-5 w-5 text-rose-400" strokeWidth={1.75} />
@@ -118,7 +115,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700/80 hover:translate-y-[-1px] transition-all duration-200">
+          <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 card-hover animate-fade-in-up delay-300 animate-delay-base">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-indigo-500/10 rounded-xl">
                 <Wallet className="h-5 w-5 text-indigo-400" strokeWidth={1.75} />
@@ -132,10 +129,10 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Charts Section */}
+      {/* Секция графиков */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Expenses by Category */}
-        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6">
+        {/* Расходы по категориям */}
+        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 card-hover animate-fade-in-up delay-300 animate-delay-base">
           <h3 className="text-lg font-semibold mb-4">Расходы по категориям</h3>
           {byCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -172,8 +169,8 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Income by Source */}
-        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6">
+        {/* Доходы по источникам */}
+        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 card-hover animate-fade-in-up delay-400 animate-delay-base">
           <h3 className="text-lg font-semibold mb-4">Доходы по источникам</h3>
           {bySource.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -203,8 +200,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recurring Expenses */}
-      <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6">
+      {/* Постоянные расходы */}
+      <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 card-hover animate-fade-in-up delay-500 animate-delay-base">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-violet-500/10 rounded-xl">
             <Repeat className="h-5 w-5 text-violet-400" strokeWidth={1.75} />
@@ -219,7 +216,7 @@ export default function DashboardPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {recurring.items.map((item, idx) => (
-                <div key={idx} className="bg-slate-800/40 rounded-xl p-4 border border-slate-700/50 hover:border-slate-600/80 transition-colors">
+                <div key={idx} className="bg-slate-800/40 rounded-xl p-4 border border-slate-700/50 card-hover">
                   <p className="font-medium text-slate-200">{item.name}</p>
                   <p className="text-lg font-semibold text-violet-400 mt-1 font-mono tabular-nums">{formatMoney(item.amountMinor)} сум</p>
                   <p className="text-xs text-slate-500 mt-1 capitalize">{item.recurrence === 'monthly' ? 'Ежемесячно' : 'Ежегодно'}</p>

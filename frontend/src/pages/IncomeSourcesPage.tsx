@@ -88,21 +88,21 @@ export default function IncomeSourcesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-fade-in-up">
         <h2 className="text-2xl font-semibold tracking-tight">Источники дохода</h2>
         <button
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors shadow-lg shadow-indigo-600/20"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/20 btn-lift"
         >
           <Plus className="h-4 w-4" strokeWidth={2} />
           Добавить источник
         </button>
       </div>
 
-      {error && <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl">{error}</div>}
+      {error && <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 px-4 py-3 rounded-xl animate-fade-in-up">{error}</div>}
 
       {showForm && (
-        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 max-w-lg">
+        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800/60 rounded-2xl p-6 max-w-lg animate-fade-in-scale">
           <h3 className="text-lg font-semibold mb-4">{editingId ? 'Редактировать источник' : 'Новый источник'}</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -112,7 +112,7 @@ export default function IncomeSourcesPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 input-glow"
               />
             </div>
             <div>
@@ -120,7 +120,7 @@ export default function IncomeSourcesPage() {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as IncomeSourceType)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 input-glow"
               >
                 <option value="salary">Зарплата</option>
                 <option value="freelance">Фриланс</option>
@@ -128,10 +128,10 @@ export default function IncomeSourcesPage() {
               </select>
             </div>
             <div className="flex gap-3 pt-2">
-              <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-colors">
+              <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all duration-200 btn-lift">
                 Сохранить
               </button>
-              <button type="button" onClick={closeForm} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-colors">
+              <button type="button" onClick={closeForm} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl transition-all duration-200 btn-lift">
                 Отмена
               </button>
             </div>
@@ -144,7 +144,7 @@ export default function IncomeSourcesPage() {
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-400"></div>
         </div>
       ) : sources.length > 0 ? (
-        <div className="overflow-x-auto rounded-2xl border border-slate-800/80">
+        <div className="overflow-x-auto rounded-2xl border border-slate-800/60 animate-fade-in-up delay-200 animate-delay-base">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-900 text-slate-400 font-medium">
               <tr>
@@ -154,24 +154,24 @@ export default function IncomeSourcesPage() {
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-800/60">
               {sources.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-800/30 transition-colors">
+                <tr key={s.id} className="hover:bg-slate-800/30 transition-colors duration-200">
                   <td className="px-4 py-3 text-slate-200">{s.name}</td>
                   <td className="px-4 py-3 text-slate-400 capitalize">
                     {s.type === 'salary' ? 'Зарплата' : s.type === 'freelance' ? 'Фриланс' : 'Другое'}
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => handleToggleActive(s)} className="text-slate-400 hover:text-slate-200 transition-colors">
+                    <button onClick={() => handleToggleActive(s)} className="text-slate-400 hover:text-slate-200 transition-all duration-200 p-1 rounded-lg hover:bg-slate-800/50">
                       {s.isActive ? <ToggleRight className="h-5 w-5 text-emerald-400" /> : <ToggleLeft className="h-5 w-5" />}
                     </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => handleEdit(s)} className="p-1 text-slate-400 hover:text-indigo-400 transition-colors">
+                      <button onClick={() => handleEdit(s)} className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all duration-200">
                         <Pencil className="h-4 w-4" />
                       </button>
-                      <button onClick={() => handleDelete(s.id)} className="p-1 text-slate-400 hover:text-rose-400 transition-colors">
+                      <button onClick={() => handleDelete(s.id)} className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all duration-200">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -182,7 +182,7 @@ export default function IncomeSourcesPage() {
           </table>
         </div>
       ) : (
-        <div className="text-center py-12 text-slate-500">Источников пока нет</div>
+        <div className="text-center py-12 text-slate-500 animate-fade-in-up">Источников пока нет</div>
       )}
     </div>
   );

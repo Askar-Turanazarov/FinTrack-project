@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import type { Category } from '../types';
+import type { Category, Recurrence } from '../types';
 
 interface ExpenseFormData {
   categoryId: number;
@@ -8,7 +8,7 @@ interface ExpenseFormData {
   spentAt: string;
   description: string | null;
   isRecurring: boolean;
-  recurrence: string | null;
+  recurrence: Recurrence | null;
 }
 
 interface Props {
@@ -26,7 +26,7 @@ export default function ExpenseForm({ initialData, categories, onSubmit, onCance
   const [spentAt, setSpentAt] = useState(initialData?.spentAt ?? '');
   const [description, setDescription] = useState(initialData?.description ?? '');
   const [isRecurring, setIsRecurring] = useState(initialData?.isRecurring ?? false);
-  const [recurrence, setRecurrence] = useState<string>(initialData?.recurrence ?? 'monthly');
+  const [recurrence, setRecurrence] = useState<Recurrence>(initialData?.recurrence ?? 'monthly');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
@@ -117,7 +117,7 @@ export default function ExpenseForm({ initialData, categories, onSubmit, onCance
           <label className="block text-sm text-slate-400 mb-1">Периодичность</label>
           <select
             value={recurrence}
-            onChange={e => setRecurrence(e.target.value)}
+            onChange={e => setRecurrence(e.target.value as Recurrence)}
             className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
           >
             <option value="monthly">Ежемесячно</option>
