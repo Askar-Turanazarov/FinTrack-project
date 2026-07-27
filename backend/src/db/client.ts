@@ -31,4 +31,25 @@ export async function initDb(): Promise<void> {
   for (const stmt of statements) {
     await db.execute(stmt);
   }
+
+  const systemCategories = [
+    { name: 'Подписки', kind: 'subscription' },
+    { name: 'Коммуналка', kind: 'utility' },
+    { name: 'Продукты', kind: 'groceries' },
+    { name: 'Аренда', kind: 'rent' },
+    { name: 'Прочее', kind: 'other' },
+  ];
+
+  for (const cat of systemCategories) {
+    const rows = (await db.execute({
+      sql: 'SELECT id FROM categories WHERE name = ? AND user_id IS NULL',
+      args: [cat.name],
+    })).rows;
+    if ((rows as any[]).length === 0) {
+      await db.execute({
+        sql: 'INSERT OR IGNORE INTO categories (user_id, name, kind) VALUES (NULL, ?, ?)',
+        args: [cat.name, cat.kind],
+      });
+    }
+  }
 }
