@@ -137,7 +137,7 @@ export default function LandingPage() {
 
         {/* Футер */}
         <footer className="mt-24 text-center text-sm text-slate-600 animate-fade-in-up delay-500 animate-delay-base">
-          <p>FinTrack — персональный трекер финансов</p>
+          <p>FinTrack — Ваш персональный трекер финансов. © Askar Turanazarov. 2026</p>
         </footer>
       </section>
     </div>
