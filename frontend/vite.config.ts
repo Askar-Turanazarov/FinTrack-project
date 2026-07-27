@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/FinTrack-project/',   // <-- имя твоего репозитория, замени если другое
+  base: '/',
   server: {
     port: 5173,
   },

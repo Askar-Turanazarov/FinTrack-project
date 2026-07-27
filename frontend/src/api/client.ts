@@ -22,7 +22,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (!response.ok) {
     if (response.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/FinTrack-project/login';
+      window.location.href = '/login';
     }
     throw data;
   }

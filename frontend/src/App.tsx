@@ -12,7 +12,7 @@ import IncomeSourcesPage from './pages/IncomeSourcesPage';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/FinTrack-project">
+    <BrowserRouter>
       <AuthProvider>
         <Routes>
           {/* Публичные маршруты */}
