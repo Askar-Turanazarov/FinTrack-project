@@ -37,6 +37,16 @@ export async function initDb(): Promise<void> {
     { name: 'Коммуналка', kind: 'utility' },
     { name: 'Продукты', kind: 'groceries' },
     { name: 'Аренда', kind: 'rent' },
+    { name: 'Жилье и ЖКХ', kind: 'rent' },
+    { name: 'Транспорт', kind: 'other' },
+    { name: 'Кафе и рестораны', kind: 'other' },
+    { name: 'Здоровье и уход', kind: 'other' },
+    { name: 'Шопинг', kind: 'other' },
+    { name: 'Развлечения и подписки', kind: 'subscription' },
+    { name: 'Кредиты и финансы', kind: 'other' },
+    { name: 'Семья и питомцы', kind: 'other' },
+    { name: 'Подарки и донаты', kind: 'other' },
+    { name: 'Путешествия', kind: 'other' },
     { name: 'Прочее', kind: 'other' },
   ];
 

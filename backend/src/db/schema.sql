@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS categories (
   user_id  INTEGER REFERENCES users(id) ON DELETE CASCADE,
   name     TEXT    NOT NULL,
   kind     TEXT    NOT NULL DEFAULT 'other'
-           CHECK (kind IN ('subscription','utility','groceries','rent','other')),
+           CHECK (kind IN ('subscription','utility','groceries','rent','transport','food','health','shopping','entertainment','finance','family','gifts','travel','other')),
   icon     TEXT,
   color    TEXT
 );
