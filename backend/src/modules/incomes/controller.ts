@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import * as service from './service.js';
 
-export function list(req: Request, res: Response, next: NextFunction) {
+export async function list(req: Request, res: Response, next: NextFunction) {
   try {
     const { from, to, sourceId, page = '1', limit = '20' } = req.query;
-    const result = service.listIncomes(req.userId!, {
+    const result = await service.listIncomes(req.userId!, {
       from: from as string | undefined,
       to: to as string | undefined,
       sourceId: sourceId ? Number(sourceId) : undefined,
@@ -17,36 +17,36 @@ export function list(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export function create(req: Request, res: Response, next: NextFunction) {
+export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const income = service.createIncome(req.userId!, req.body);
+    const income = await service.createIncome(req.userId!, req.body);
     res.status(201).json(income);
   } catch (err) {
     next(err);
   }
 }
 
-export function getById(req: Request, res: Response, next: NextFunction) {
+export async function getById(req: Request, res: Response, next: NextFunction) {
   try {
-    const income = service.getIncomeById(Number(req.params.id), req.userId!);
+    const income = await service.getIncomeById(Number(req.params.id), req.userId!);
     res.json(income);
   } catch (err) {
     next(err);
   }
 }
 
-export function update(req: Request, res: Response, next: NextFunction) {
+export async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    const income = service.updateIncome(Number(req.params.id), req.userId!, req.body);
+    const income = await service.updateIncome(Number(req.params.id), req.userId!, req.body);
     res.json(income);
   } catch (err) {
     next(err);
   }
 }
 
-export function remove(req: Request, res: Response, next: NextFunction) {
+export async function remove(req: Request, res: Response, next: NextFunction) {
   try {
-    service.deleteIncome(Number(req.params.id), req.userId!);
+    await service.deleteIncome(Number(req.params.id), req.userId!);
     res.status(204).end();
   } catch (err) {
     next(err);

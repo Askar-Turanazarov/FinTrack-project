@@ -1,12 +1,13 @@
-import db from '../../db/client.js';
+import { getClient } from '../../db/client.js';
 
-export function listExpenses(userId: number, params: {
+export async function listExpenses(userId: number, params: {
   from?: string;
   to?: string;
   categoryId?: number;
   page: number;
   limit: number;
 }) {
+  const db = getClient();
   const { from, to, categoryId, page, limit } = params;
   const conditions: string[] = ['e.user_id = ?'];
   const values: any[] = [userId];
@@ -18,12 +19,13 @@ export function listExpenses(userId: number, params: {
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
   const offset = (page - 1) * limit;
 
-  const countRow = db.prepare(`SELECT COUNT(*) as total FROM expenses e ${where}`).get(...values) as any;
+  const countRow = (await db.execute({ sql: `SELECT COUNT(*) as total FROM expenses e ${where}`, args: values })).rows[0] as any;
   const total = countRow.total;
 
-  const rows = db.prepare(
-    `SELECT e.* FROM expenses e ${where} ORDER BY e.spent_at DESC LIMIT ? OFFSET ?`
-  ).all(...values, limit, offset);
+  const rows = (await db.execute({
+    sql: `SELECT e.* FROM expenses e ${where} ORDER BY e.spent_at DESC LIMIT ? OFFSET ?`,
+    args: [...values, limit, offset],
+  })).rows;
 
   return {
     items: rows.map(row => mapRow(row)),
@@ -33,57 +35,62 @@ export function listExpenses(userId: number, params: {
   };
 }
 
-export function createExpense(userId: number, data: any) {
-  const stmt = db.prepare(`
-    INSERT INTO expenses (user_id, category_id, amount_minor, currency, spent_at, description, is_recurring, recurrence)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-  const result = stmt.run(
-    userId,
-    data.categoryId,
-    data.amountMinor,
-    data.currency,
-    data.spentAt,
-    data.description ?? null,
-    data.isRecurring ? 1 : 0,
-    data.recurrence ?? null,
-  );
-  return getExpenseById(result.lastInsertRowid as number, userId);
+export async function createExpense(userId: number, data: any) {
+  const db = getClient();
+  const result = await db.execute({
+    sql: `INSERT INTO expenses (user_id, category_id, amount_minor, currency, spent_at, description, is_recurring, recurrence)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      userId,
+      data.categoryId,
+      data.amountMinor,
+      data.currency,
+      data.spentAt,
+      data.description ?? null,
+      data.isRecurring ? 1 : 0,
+      data.recurrence ?? null,
+    ],
+  });
+  return getExpenseById(Number(result.lastInsertRowid), userId);
 }
 
-export function getExpenseById(id: number, userId: number) {
-  const row = db.prepare('SELECT * FROM expenses WHERE id = ? AND user_id = ?').get(id, userId) as any;
+export async function getExpenseById(id: number, userId: number) {
+  const db = getClient();
+  const row = (await db.execute({ sql: 'SELECT * FROM expenses WHERE id = ? AND user_id = ?', args: [id, userId] })).rows[0] as any;
   if (!row) {
     throw Object.assign(new Error('Расход не найден'), { status: 404, code: 'NOT_FOUND' });
   }
   return mapRow(row);
 }
 
-export function updateExpense(id: number, userId: number, data: any) {
-  const existing = getExpenseById(id, userId);
+export async function updateExpense(id: number, userId: number, data: any) {
+  const existing = await getExpenseById(id, userId);
   const merged = { ...existing, ...data };
+  const db = getClient();
 
-  db.prepare(`
-    UPDATE expenses SET category_id=?, amount_minor=?, currency=?, spent_at=?, description=?, is_recurring=?, recurrence=?
-    WHERE id=? AND user_id=?
-  `).run(
-    merged.categoryId,
-    merged.amountMinor,
-    merged.currency,
-    merged.spentAt,
-    merged.description ?? null,
-    merged.isRecurring ? 1 : 0,
-    merged.recurrence ?? null,
-    id,
-    userId,
-  );
+  await db.execute({
+    sql: `UPDATE expenses SET category_id=?, amount_minor=?, currency=?, spent_at=?, description=?, is_recurring=?, recurrence=?
+      WHERE id=? AND user_id=?`,
+    args: [
+      merged.categoryId,
+      merged.amountMinor,
+      merged.currency,
+      merged.spentAt,
+      merged.description ?? null,
+      merged.isRecurring ? 1 : 0,
+      merged.recurrence ?? null,
+      id,
+      userId,
+    ],
+  });
 
   return getExpenseById(id, userId);
 }
 
-export function deleteExpense(id: number, userId: number) {
-  const expense = getExpenseById(id, userId);
-  db.prepare('DELETE FROM expenses WHERE id = ? AND user_id = ?').run(id, userId);
+export async function deleteExpense(id: number, userId: number) {
+  const expense = await getExpenseById(id, userId);
+  const db = getClient();
+  await db.execute({ sql: 'DELETE FROM expenses WHERE id = ? AND user_id = ?', args: [id, userId] });
   return expense;
 }
 

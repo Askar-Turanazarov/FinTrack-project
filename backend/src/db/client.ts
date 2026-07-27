@@ -1,22 +1,34 @@
-import Database from 'better-sqlite3';
-import fs from 'fs';
+import { createClient, Client } from '@libsql/client';
+import { env } from '../config/env.js';
+import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { env } from '../config/env.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const dbDir = path.dirname(env.DATABASE_URL);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+let client: Client;
+
+export function getClient(): Client {
+  if (!client) {
+    client = createClient({
+      url: env.TURSO_DATABASE_URL,
+      authToken: env.TURSO_AUTH_TOKEN || undefined,
+    });
+  }
+  return client;
 }
 
-const db = new Database(env.DATABASE_URL);
+export async function initDb(): Promise<void> {
+  const db = getClient();
+  const schemaPath = path.resolve(__dirname, 'schema.sql');
+  const schema = readFileSync(schemaPath, 'utf-8');
 
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+  const statements = schema
+    .split(';')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 
-const schema = fs.readFileSync(path.resolve(__dirname, 'schema.sql'), 'utf8');
-db.exec(schema);
-
-export default db;
+  for (const stmt of statements) {
+    await db.execute(stmt);
+  }
+}

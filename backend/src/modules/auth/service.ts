@@ -1,19 +1,20 @@
-import db from '../../db/client.js';
+import { getClient } from '../../db/client.js';
 import { hashPassword, comparePassword } from '../../utils/hash.js';
 import { signToken } from '../../utils/jwt.js';
 
 export async function registerUser(email: string, password: string, displayName?: string) {
-  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+  const db = getClient();
+  const existing = (await db.execute({ sql: 'SELECT id FROM users WHERE email = ?', args: [email] })).rows[0];
   if (existing) {
     throw Object.assign(new Error('Email уже занят'), { status: 409, code: 'CONFLICT' });
   }
 
   const passwordHash = await hashPassword(password);
-  const stmt = db.prepare(
-    'INSERT INTO users (email, password_hash, display_name) VALUES (?, ?, ?)'
-  );
-  const result = stmt.run(email, passwordHash, displayName || null);
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid) as any;
+  const result = await db.execute({
+    sql: 'INSERT INTO users (email, password_hash, display_name) VALUES (?, ?, ?)',
+    args: [email, passwordHash, displayName || null],
+  });
+  const user = (await db.execute({ sql: 'SELECT * FROM users WHERE id = ?', args: [Number(result.lastInsertRowid)] })).rows[0] as any;
 
   const token = signToken(user.id);
 
@@ -30,7 +31,8 @@ export async function registerUser(email: string, password: string, displayName?
 }
 
 export async function loginUser(email: string, password: string) {
-  const row = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as any;
+  const db = getClient();
+  const row = (await db.execute({ sql: 'SELECT * FROM users WHERE email = ?', args: [email] })).rows[0] as any;
   if (!row) {
     throw Object.assign(new Error('Неверный email или пароль'), { status: 401, code: 'UNAUTHORIZED' });
   }
@@ -54,8 +56,9 @@ export async function loginUser(email: string, password: string) {
   };
 }
 
-export function getUserById(userId: number) {
-  const row = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as any;
+export async function getUserById(userId: number) {
+  const db = getClient();
+  const row = (await db.execute({ sql: 'SELECT * FROM users WHERE id = ?', args: [userId] })).rows[0] as any;
   if (!row) {
     throw Object.assign(new Error('Пользователь не найден'), { status: 404, code: 'NOT_FOUND' });
   }

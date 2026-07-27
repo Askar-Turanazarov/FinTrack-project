@@ -1,4 +1,4 @@
-import db from './client.js';
+import { getClient, initDb } from './client.js';
 
 const systemCategories = [
   { name: 'Подписки', kind: 'subscription' },
@@ -8,13 +8,19 @@ const systemCategories = [
   { name: 'Прочее', kind: 'other' },
 ] as const;
 
-const insert = db.prepare(
-  'INSERT OR IGNORE INTO categories (user_id, name, kind) VALUES (NULL, ?, ?)'
-);
+async function seed() {
+  await initDb();
+  const db = getClient();
 
-for (const cat of systemCategories) {
-  insert.run(cat.name, cat.kind);
+  for (const cat of systemCategories) {
+    await db.execute({
+      sql: 'INSERT OR IGNORE INTO categories (user_id, name, kind) VALUES (NULL, ?, ?)',
+      args: [cat.name, cat.kind],
+    });
+  }
+
+  console.log('System categories seeded.');
+  process.exit(0);
 }
 
-console.log('System categories seeded.');
-process.exit(0);
+seed();

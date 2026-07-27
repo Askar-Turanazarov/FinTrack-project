@@ -1,21 +1,22 @@
-import db from '../../db/client.js';
+import { getClient } from '../../db/client.js';
 
-export function getMonthlySummary(userId: number, month: string) {
+export async function getMonthlySummary(userId: number, month: string) {
+  const db = getClient();
   const [year, mon] = month.split('-');
   const from = `${year}-${mon}-01`;
   const to = getNextMonth(from);
 
-  const incomeRow = db.prepare(`
-    SELECT COALESCE(SUM(amount_minor), 0) AS total
-    FROM incomes
-    WHERE user_id = ? AND received_at >= ? AND received_at < ?
-  `).get(userId, from, to) as any;
+  const incomeRow = (await db.execute({
+    sql: `SELECT COALESCE(SUM(amount_minor), 0) AS total
+      FROM incomes WHERE user_id = ? AND received_at >= ? AND received_at < ?`,
+    args: [userId, from, to],
+  })).rows[0] as any;
 
-  const expenseRow = db.prepare(`
-    SELECT COALESCE(SUM(amount_minor), 0) AS total
-    FROM expenses
-    WHERE user_id = ? AND spent_at >= ? AND spent_at < ?
-  `).get(userId, from, to) as any;
+  const expenseRow = (await db.execute({
+    sql: `SELECT COALESCE(SUM(amount_minor), 0) AS total
+      FROM expenses WHERE user_id = ? AND spent_at >= ? AND spent_at < ?`,
+    args: [userId, from, to],
+  })).rows[0] as any;
 
   const totalIncomeMinor = incomeRow.total;
   const totalExpenseMinor = expenseRow.total;
@@ -29,19 +30,19 @@ export function getMonthlySummary(userId: number, month: string) {
   };
 }
 
-export function getByCategory(userId: number, month: string) {
+export async function getByCategory(userId: number, month: string) {
+  const db = getClient();
   const [year, mon] = month.split('-');
   const from = `${year}-${mon}-01`;
   const to = getNextMonth(from);
 
-  const rows = db.prepare(`
-    SELECT e.category_id, c.name, c.kind, SUM(e.amount_minor) AS total
-    FROM expenses e
-    JOIN categories c ON c.id = e.category_id
-    WHERE e.user_id = ? AND e.spent_at >= ? AND e.spent_at < ?
-    GROUP BY e.category_id, c.name, c.kind
-    ORDER BY total DESC
-  `).all(userId, from, to) as any[];
+  const rows = (await db.execute({
+    sql: `SELECT e.category_id, c.name, c.kind, SUM(e.amount_minor) AS total
+      FROM expenses e JOIN categories c ON c.id = e.category_id
+      WHERE e.user_id = ? AND e.spent_at >= ? AND e.spent_at < ?
+      GROUP BY e.category_id, c.name, c.kind ORDER BY total DESC`,
+    args: [userId, from, to],
+  })).rows as any[];
 
   return {
     month,
@@ -54,19 +55,19 @@ export function getByCategory(userId: number, month: string) {
   };
 }
 
-export function getBySource(userId: number, month: string) {
+export async function getBySource(userId: number, month: string) {
+  const db = getClient();
   const [year, mon] = month.split('-');
   const from = `${year}-${mon}-01`;
   const to = getNextMonth(from);
 
-  const rows = db.prepare(`
-    SELECT i.source_id, s.name, SUM(i.amount_minor) AS total
-    FROM incomes i
-    LEFT JOIN income_sources s ON s.id = i.source_id
-    WHERE i.user_id = ? AND i.received_at >= ? AND i.received_at < ?
-    GROUP BY i.source_id, s.name
-    ORDER BY total DESC
-  `).all(userId, from, to) as any[];
+  const rows = (await db.execute({
+    sql: `SELECT i.source_id, s.name, SUM(i.amount_minor) AS total
+      FROM incomes i LEFT JOIN income_sources s ON s.id = i.source_id
+      WHERE i.user_id = ? AND i.received_at >= ? AND i.received_at < ?
+      GROUP BY i.source_id, s.name ORDER BY total DESC`,
+    args: [userId, from, to],
+  })).rows as any[];
 
   return {
     month,
@@ -78,23 +79,25 @@ export function getBySource(userId: number, month: string) {
   };
 }
 
-export function getRecurring(userId: number) {
-  const rows = db.prepare(`
-    SELECT category_id, amount_minor, recurrence
-    FROM expenses
-    WHERE user_id = ? AND is_recurring = 1
-  `).all(userId) as any[];
+export async function getRecurring(userId: number) {
+  const db = getClient();
+  const rows = (await db.execute({
+    sql: `SELECT category_id, amount_minor, recurrence
+      FROM expenses WHERE user_id = ? AND is_recurring = 1`,
+    args: [userId],
+  })).rows as any[];
 
-  const items = rows.map(row => {
-    const cat = db.prepare('SELECT name FROM categories WHERE id = ?').get(row.category_id) as any;
-    return {
+  const items = [];
+  for (const row of rows) {
+    const cat = (await db.execute({ sql: 'SELECT name FROM categories WHERE id = ?', args: [row.category_id] })).rows[0] as any;
+    items.push({
       type: 'expense' as const,
       categoryId: row.category_id,
       name: cat?.name || 'Неизвестная',
       amountMinor: row.amount_minor,
       recurrence: row.recurrence,
-    };
-  });
+    });
+  }
 
   const monthlyExpenseMinor = items
     .filter(item => item.recurrence === 'monthly')

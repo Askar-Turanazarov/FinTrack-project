@@ -21,9 +21,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export function me(req: Request, res: Response, next: NextFunction) {
+export async function me(req: Request, res: Response, next: NextFunction) {
   try {
-    const user = authService.getUserById(req.userId!);
+    const user = await authService.getUserById(req.userId!);
     res.status(200).json({ user });
   } catch (err) {
     next(err);
